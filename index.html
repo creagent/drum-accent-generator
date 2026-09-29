@@ -26,7 +26,7 @@
     .hint { margin: 0; font-size: .9rem; font-weight: 400; }
     button { min-height: 54px; padding: 12px 20px; border: 0; border-radius: 10px; background: #ffca59; color: #171923; font: inherit; font-weight: 750; cursor: pointer; }
     button:hover { background: #ffda83; }
-    .output-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 34px 0 14px; }
+    .output-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin: 34px 0 14px; scroll-margin-top: 16px; }
     h2 { margin: 0; font-size: 1.4rem; }
     #copy, #theme-toggle { min-height: 44px; padding: 8px 12px; background: var(--secondary); color: var(--text); font-size: .9rem; }
     #copy:hover, #theme-toggle:hover { background: var(--secondary-hover); }
@@ -113,6 +113,12 @@
       }));
       copyButton.hidden = false;
       status.textContent = `Сгенерировано тактов: ${bars}`;
+      if (event.submitter) {
+        document.querySelector('.output-header').scrollIntoView({
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+          block: 'start'
+        });
+      }
     });
 
     copyButton.addEventListener('click', async () => {
