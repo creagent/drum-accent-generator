@@ -11,33 +11,36 @@
   <link rel="apple-touch-icon" href="./icon-192.png">
   <title>Генератор акцентов для барабанщиков</title>
   <style>
-    :root { color-scheme: dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    :root { --page: #11131b; --text: #f5f5f7; --muted: #b8bbc9; --panel: #1b1e29; --border: #343746; --input-border: #565b70; --secondary: #303548; --secondary-hover: #414861; --focus: #ffcb61; color-scheme: dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    :root[data-theme="light"] { --page: #f5f6fa; --text: #171923; --muted: #52596a; --panel: #ffffff; --border: #d8dce6; --input-border: #868d9f; --secondary: #e5e8f0; --secondary-hover: #d5dae6; --focus: #8c5900; color-scheme: light; }
     * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; background: #11131b; color: #f5f5f7; }
+    body { margin: 0; min-height: 100vh; background: var(--page); color: var(--text); }
     main { width: min(100% - 32px, 720px); margin: 0 auto; padding: 40px 0 72px; }
     h1 { margin: 0 0 10px; font-size: clamp(2rem, 6vw, 3rem); line-height: 1.1; }
-    .intro, .hint { color: #b8bbc9; line-height: 1.5; }
+    .intro, .hint { color: var(--muted); line-height: 1.5; }
     .intro { margin: 0 0 32px; }
-    form { display: grid; gap: 18px; padding: 24px; border: 1px solid #343746; border-radius: 20px; background: #1b1e29; }
+    form { display: grid; gap: 18px; padding: 24px; border: 1px solid var(--border); border-radius: 20px; background: var(--panel); }
     label { display: grid; gap: 7px; font-weight: 650; }
-    input { width: 100%; min-height: 52px; padding: 10px 14px; border: 1px solid #565b70; border-radius: 10px; outline: none; background: #11131b; color: #fff; font: inherit; font-size: 1.2rem; }
-    input:focus-visible, button:focus-visible { outline: 3px solid #ffcb61; outline-offset: 2px; }
+    input { width: 100%; min-height: 52px; padding: 10px 14px; border: 1px solid var(--input-border); border-radius: 10px; outline: none; background: var(--page); color: var(--text); font: inherit; font-size: 1.2rem; }
+    input:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
     .hint { margin: 0; font-size: .9rem; font-weight: 400; }
     button { min-height: 54px; padding: 12px 20px; border: 0; border-radius: 10px; background: #ffca59; color: #171923; font: inherit; font-weight: 750; cursor: pointer; }
     button:hover { background: #ffda83; }
     .output-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 34px 0 14px; }
     h2 { margin: 0; font-size: 1.4rem; }
-    #copy { min-height: 40px; padding: 8px 12px; background: #303548; color: #fff; font-size: .9rem; }
-    #copy:hover { background: #414861; }
+    #copy, #theme-toggle { min-height: 44px; padding: 8px 12px; background: var(--secondary); color: var(--text); font-size: .9rem; }
+    #copy:hover, #theme-toggle:hover { background: var(--secondary-hover); }
+    .toolbar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
     #copy[hidden] { display: none; }
     #result { display: grid; grid-template-columns: repeat(4, minmax(max-content, 1fr)); gap: 6px; margin: 0; padding: 0; overflow-x: auto; list-style: none; }
-    #result li { padding: 12px 6px; border: 1px solid #343746; border-radius: 12px; background: #1b1e29; font-size: clamp(.8rem, 2.8vw, 1.35rem); font-weight: 650; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    #status { min-height: 1.5em; color: #b8bbc9; }
+    #result li { padding: 12px 6px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); font-size: clamp(.8rem, 2.8vw, 1.35rem); font-weight: 650; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    #status { min-height: 1.5em; color: var(--muted); }
     @media (max-width: 480px) { main { padding-top: 28px; } form { padding: 18px; } }
   </style>
 </head>
 <body>
   <main>
+    <div class="toolbar"><button id="theme-toggle" type="button">Светлая тема</button></div>
     <h1>Генератор акцентов</h1>
     <p class="intro">Случайные позиции акцентов для отработки техники рук. Каждое число показывает, на какую ноту доли приходится акцент.</p>
 
@@ -70,6 +73,23 @@
     const copyButton = document.querySelector('#copy');
     const status = document.querySelector('#status');
     let generatedBars = [];
+    const themeButton = document.querySelector('#theme-toggle');
+
+    function applyTheme(theme) {
+      document.documentElement.dataset.theme = theme;
+      themeButton.textContent = theme === 'dark' ? 'Светлая тема' : 'Тёмная тема';
+      themeButton.setAttribute('aria-label', theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему');
+      document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#171923' : '#f5f6fa';
+    }
+
+    let savedTheme = 'dark';
+    try { savedTheme = localStorage.getItem('drum-accents-theme') || 'dark'; } catch {}
+    applyTheme(savedTheme === 'light' ? 'light' : 'dark');
+    themeButton.addEventListener('click', () => {
+      const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(theme);
+      try { localStorage.setItem('drum-accents-theme', theme); } catch {}
+    });
 
     function randomNumber(max) {
       return Math.floor(Math.random() * max) + 1;
