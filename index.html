@@ -32,8 +32,8 @@
     #copy:hover, #theme-toggle:hover { background: var(--secondary-hover); }
     .toolbar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
     #copy[hidden] { display: none; }
-    #result { display: grid; grid-template-columns: repeat(4, minmax(max-content, 1fr)); gap: 6px; margin: 0; padding: 0; overflow-x: auto; list-style: none; }
-    #result li { padding: 12px 6px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); font-size: clamp(.8rem, 2.8vw, 1.35rem); font-weight: 650; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    #result { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+    #result li { flex: 1 1 auto; width: max-content; min-width: calc((100% - 30px) / 4); max-width: 100%; padding: 16px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel); font-size: clamp(1.5rem, 4vw, 1.75rem); font-weight: 650; text-align: center; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
     #status { min-height: 1.5em; color: var(--muted); }
     @media (max-width: 480px) { main { padding-top: 28px; } form { padding: 18px; } }
   </style>
